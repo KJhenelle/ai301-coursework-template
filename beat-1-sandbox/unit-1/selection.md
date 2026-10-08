@@ -17,7 +17,7 @@ wrong label is not graded.
 
 [The individual Path Review issue page. A link to the repository or the issue list
 does not satisfy this field.]
-https://github.com/zxcalc/zxlive/issues/519
+https://github.com/codepath/pathreview-ai301-fa26-howard/issues/67
 
 **Verdict output**
 
@@ -32,43 +32,40 @@ recording `reject` for the issue you chose earns no credit for this field.
 
 ```
 {
-  "id": "issue-11",
-  "verdict": "accept",
-  "failed_checks": [
-    "beginner_friendly"
-  ],
+  "item": "https://github.com/codepath/pathreview-ai301-fa26-howard/issues/67",
   "checks": [
     {
       "name": "unclaimed",
       "grade": "pass",
-      "evidence": "assignees: none; linked PRs: none; 0 comments, no claim"
+      "evidence": "Issue has no assignees, 0 comments, and no branches or pull requests listed under Development."
     },
     {
       "name": "policy_allowed",
       "grade": "pass",
-      "evidence": "CONTRIBUTING.md: no statement on AI or contribution tooling"
+      "evidence": "README directs contributors to docs/CONTRIBUTING.md, which welcomes fork-based contributions; neither it nor the PR template requires internal-maintainer-only PRs, a CLA, or an AI-use disclosure."
     },
     {
       "name": "repo_in_use",
       "grade": "pass",
-      "evidence": "archived: no; last push to any branch: 2026-08-04"
+      "evidence": "Repository metadata says archived: false; the repo describes itself as the Fall 2026 student copy, and main has a commit dated 2026-09-16."
     },
     {
       "name": "maintainer_active",
       "grade": "pass",
-      "evidence": "default-branch commits on 2026-08-04, within 90 days of 2026-09-29"
+      "evidence": "Default-branch commit history shows activity on 2026-09-16, within 90 days of 2026-10-08."
     },
     {
       "name": "scope_bounded",
       "grade": "pass",
-      "evidence": "issue describes one concrete bug: a specific rewrite (strong complementary) firing multiple times on sidebar click"
+      "evidence": "The issue identifies a specific defect in POST /reviews: create_review() does not verify that the supplied profile belongs to the authenticated user."
     },
     {
       "name": "beginner_friendly",
       "grade": "fail",
-      "evidence": "labels are Type: bug, Category: Proof mode, Priority: Medium; no beginner label; 0 comments so no maintainer invite"
+      "evidence": "Labels are bug and tier-2 (Intermediate difficulty); there are 0 comments and no beginner label or maintainer invitation."
     }
-  ]
+  ],
+  "verdict": "accept"
 }
 ```
 
