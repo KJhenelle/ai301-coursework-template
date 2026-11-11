@@ -9,9 +9,8 @@ files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
 **Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
+**GitHub Username:** Kjhenelle
+**Issue:** [\[GitHub issue link\]](https://github.com/ParadiseSS13/Paradise/issues/32854)
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -55,10 +54,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 9: issue-scout with a fit-profile search strategy, fixed after scan 1**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I turned my issue-select skill into issue-scout, with a search strategy of `gh search issues` queries and ranking rules, and ran one scan. It fell short in three ways: my 100-result limit returned only the newest issues, so every Python result was dropped and all five graded issues were JavaScript; `unclaimed` accepted an issue whose owner had approved a claim 25 days earlier; and `maintainer_active` passed a repo on one 80-day-old commit while two strangers' proposals sat unanswered. I moved the `--comments 0` and date filters into the queries (267 merged results became 74), made `unclaimed` fail on any claim of any age, and made `maintainer_active` require recent maintainer activity plus replies to outside comments. I then graded two Issue Selection picks with the fixed rubric: `maintainer_active` passed Paradise #32854 (commits and a merged PR within days, replies the same day) and failed nomnom #214 (latest commit 2026-09-18, outside comments with no reply), so it separated an active repo from a quiet one. I still haven't re-run the full scan, so I don't know whether it is too strict for small student repos, and the scout still has no check for repos that require maintainer assignment before a PR.
 
 **Unit 6: [one line on the tool work]**
 
