@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Jhenelle
 **GitHub Username:** KJhenelle
 **Issue:** [Customisation of force vectors (OpenChemistry/avogadrolibs#2095)](https://github.com/OpenChemistry/avogadrolibs/issues/2095)
-**Pull Request:** [GitHub PR link, once opened]
+**Pull Request:** [OpenChemistry/avogadrolibs#3370](https://github.com/OpenChemistry/avogadrolibs/pull/3370)
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -62,15 +62,13 @@ I turned my issue-select skill into issue-scout, with a search strategy of `gh s
 
 I added an Upstream section to my voice guide (claim, question and ping rules) and installed a hook that checks every `gh issue comment` against it before it goes out. It stopped my claim draft twice: once because my question didn't say what I had already tried, and once when I wrote "ASAP" instead of a date, which my own claim rule forbids. It also blocked a post when I chained a second command after it, because it read `claim-draft.md;` as the file name, so I now run the post as one plain command. For the repo I wrote a `CLAUDE.local.md` (42 lines) after reading `CONTRIBUTING.md` and the repo's own `AGENTS.md`: it imports the maintainers' guide, records the AI policy (I write every line myself; Claude explains and reviews), and holds the force plugin, `crystalscene.cpp` as the pattern, and `ArrowGeometry`'s existing `setColor` and `setRadiusScale`. It fell short because `CONTRIBUTING.md` still says to branch from `dev` when the default branch is `master`, so I wrote the correction into the file, and I kept it out of my PR with `.git/info/exclude`.
 
-**Unit 7: [one line on the tool work]**
+**Unit 11: ship-gate and a gate manifest on the force-arrow branch**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+I wrote `ship-manifest.md` for avogadrolibs (clang-format on the diff against `origin/master`, `cmake --build build`, full `ctest`) and ran the ship-gate on `force-arrow-settings`. The first run passed all five checks, but its notes caught three things in my description: a Developer's Certificate of Origin section that said "this repository's PR template" when the repo has no template, `Fixes #2095` on a PR that leaves arrow head size undone, and a "Before (master)" label for a screenshot from the downloaded continuous build. I fixed all three, reran, and it passed again (suite 573 s), then let it through to the PR command. What fought me was the hook: it checks the folder the session started in, so opening the PR from my coursework folder was stopped twice, and I had to run it from a Claude session started inside the avogadrolibs clone. The full suite also makes every gate run about 8 to 10 minutes, so each edit to the description costs one.
 
-**Unit 8: [one line on the tool work]**
+**Unit 12: PR monitor and a playbook written from avogadrolibs' own review times**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+I installed the PR monitor and wrote a playbook with a first-response threshold of 3 days, 7 days after approval, 5 days for a stalled review, one nudge, and walk-away cases, using a count of five merged outside-contributor PRs (typical first response under 2 days, one at 11 days). My first draft of the playbook had a 3-day staleness threshold next to "no nudge for a month", which would have let the monitor call a PR stale and then forbid the nudge, and I rewrote it so every threshold leads to the one nudge. The monitor read PR #3370 (approved, 22 checks passing, mergeable, no changes requested) and drafted a wait until 2026-11-24, citing my 7-day rule, plus an optional "thanks for testing it" that assumed the maintainer had tested the change, which the thread does not say. I did not post the optional thanks and nothing from the draft went on the PR. It fell short because my PR had no review to answer, so I only exercised the wait path, not a reply or a nudge, and the monitor said NO PR YET when I first ran `--state` from my coursework folder instead of the avogadrolibs clone.
 
 ---
 
@@ -97,26 +95,29 @@ My claim comment: https://github.com/OpenChemistry/avogadrolibs/issues/2095#issu
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+Issue #2095 is a feature request, not a bug. In Avogadro 2 you can switch on the Force display type to draw an arrow on each atom for the force acting on it, but you cannot change how those arrows look. Every other display type lets you change its settings, and Force does not. The issue asks for arrow color, length, width and head size.
 
 **Expected Behavior**
 
-[What should happen?]
+Selecting Force should show a settings panel, like the other display types, where I can set the arrow color, length and width, and the arrows should redraw straight away. The values should be remembered, and the defaults should look the same as the arrows do today. Head size is the fourth setting in the issue. I said in my claim comment that I would do it in a follow-up, so it is not part of this change.
 
 **Current Behavior**
 
-[What actually happens?]
+With Force ticked, green arrows are drawn at the length of the raw force vector. The "Force Settings" panel is empty, and Force has no "..." button, unlike Ball and Stick, Cartoons, Close Contacts, Crystal Lattice and Labels. Nothing in the app changes the arrow color, length or width. I saw this in the continuous build with `raman.cjson` (the Reproduction Process section has the steps).
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+- `avogadro/qtplugins/force/force.h` and `force.cpp`: the `Force` scene plugin. `Force::process()` draws each arrow from `pos1` to `pos1 + forceVector` and never sets a color or size, and the plugin has no settings widget. These are the only files I changed.
+- `avogadro/qtgui/sceneplugin.h`: `setupWidget()` and `hasSetupWidget()` are the hooks the app uses to fill the settings dock.
+- `avogadro/rendering/arrowgeometry.h`: it already has `setColor` and `setRadiusScale`, so no rendering change was needed.
+- `avogadro/qtplugins/crystal/crystalscene.cpp`: the existing example of a scene plugin with saved settings (`QSettings`, a lazily built widget, slots that redraw). The maintainer pointed to it in the issue, and I copied its pattern.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code in the avogadrolibs clone, in explain-and-review mode, reading `force.cpp`, `sceneplugin.h`, `arrowgeometry.h` and `crystalscene.cpp` with me; repro-check graded the claim and the reproduction.
+- What it produced: an account of how a scene plugin gets a settings dock, the finding that `ArrowGeometry` already supports color and width, and an accepted repro report.
+- Difficulties: I did not know C++ or Qt, so each term (`private slots`, `QSettings`, `setupWidget`) had to be explained before I could follow the files. It also said once that Crystal pre-fills its color button, which was wrong, and I had to check that against the file.
+- What changed: I read the file I am copying before relying on any claim about it, and I wrote the Affected Components from the code, not from the issue's description.
 
 ---
 
@@ -200,11 +201,14 @@ Done (commit f62ee3ae on branch `force-arrow-settings`):
 5. Update `process()` to apply the color, width and length.
 6. Run `git clang-format origin/master --diff` (no differences) and the full suite on commit `f62ee3ae`: 155 of 155 tests passed, finished 2026-11-16 00:05 EST.
 
-Left:
+Done since (2026-11-16):
 
-7. Add a test under `tests/qtplugins/` and register it in `tests/qtplugins/CMakeLists.txt`. It must fail without the fix and pass with it. A draft `forcetest.cpp` exists but is not registered or verified.
-8. Re-check the arrows in the app, before and after, and record the output in the PR description.
-9. Open the PR against `OpenChemistry/avogadrolibs` `master` with `Fixes #2095` and an AI-assistance disclosure.
+7. Re-checked the arrows in the app I built from `f62ee3ae`, before and after, and recorded the result in the PR description (see Testing Strategy).
+8. Opened the PR against `OpenChemistry/avogadrolibs` `master` (#3370) with `Refs #2095` and an AI-assistance disclosure.
+
+Not done:
+
+9. An automated test under `tests/qtplugins/`. A draft `forcetest.cpp` exists but does not compile, is not registered and is not in the PR.
 
 Test plan, with the observable result expected after the change:
 
@@ -216,9 +220,9 @@ Test plan, with the observable result expected after the change:
 - Automated test (step 7): fails on master and passes on the branch, for whichever of the above it can check. If it can't be done for the widget, the PR description will say why.
 - The repo's existing suite (155 tests, all passing on master) still passes. Result on `f62ee3ae`: 155 of 155 passed, finished 2026-11-16 00:05 EST.
 
-Unverified so far (2026-11-16): the built change has not been re-run against the app checks above since the commit. There is no automated test for the widget yet.
+Unverified (2026-11-16): the dock on fresh settings and restart persistence were not observed, and there is no automated test for the widget.
 
-Deviations: none so far.
+Deviations: the automated test (step 9) was not added, and the PR says so. The PR uses `Refs #2095` instead of the planned `Fixes #2095`, because arrow head size is left for a follow-up.
 
 **Toolkit**
 
@@ -231,65 +235,77 @@ Deviations: none so far.
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+I re-ran the reproduction steps (raman.cjson, Force display type on) against an app I built from commit `f62ee3ae`, and ran the repo's own checks.
+
+- **Before:** in the downloaded continuous build, the Force Settings dock is empty and the arrows are green with no way to change them.
+- **After:** the dock has Arrow length, Arrow width and Arrow color. At length 1.00, width 1.00 and an orange color the arrows are orange; at length 2.00, width 0.50 and cyan they are thinner, cyan and longer. They redraw as soon as a control changes.
+- **Repo checks on `f62ee3ae`:** `git clang-format origin/master --diff` made no changes, `cmake --build build` succeeded, and `ctest --test-dir build --output-on-failure` gave `100% tests passed out of 155`. The ship-gate reran all three (suite 573 s) and passed.
+- **Not observed:** the dock on fresh settings (the 1.00 screenshot already had a non-default color) and restart persistence of the saved values. The before and after are different builds, so they show what a user sees, not a controlled comparison.
+- **No automated test.** The widget is built from Qt controls, my draft `forcetest.cpp` does not compile, and it is not in the PR. The PR says so and asks for a pattern.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: the ship-gate with my `ship-manifest.md`, plus the app itself for the before and after.
+- What it produced: pass on formatting, build and the 155-test suite, and a test-evidence check that passed with the unobserved items disclosed.
+- Difficulties: the suite takes about 10 minutes per run, and the About dialog's version is set at configure time, so it cannot show that a build includes my change. I confirmed the build by the "Arrow color:" label instead, after an older screenshot showed "Line color:".
+- What changed: I stopped using that older screenshot, retook the after screenshots, and wrote the unobserved checks into the evidence rather than claiming them.
 
 ---
 
 ## Implementation Notes
 
-[A running log, added to as you work. Date each entry. What you
-built, decisions you made when you made them, wrong turns included.]
+**2026-11-12 to 2026-11-13: writing the change**
 
-**[Date]**
+I wrote the code myself, in `force.h` and `force.cpp`, copying the shape of `crystalscene.cpp`. I do not know C++, so Claude explained each piece (what `private slots` means, why the header and the `.cpp` are separate files, what `QSettings` does) and reviewed what I wrote, and I typed every line. The first version had a pile of typos and wrong guesses: `Qwidget` and `m_SetupWidget` spelled differently in two places, `arrows->setColor();(m_color);`, calls to `setLength` and `setArrowSize` on `ArrowGeometry` that do not exist (only `setColor` and `setRadiusScale` do), a missing `QFormLayout` include, and a helper `colorButton()` I never declared, which I deleted. I set the width default to 0.5 first, then changed it to 1.0 because that is what `ArrowGeometry` already draws, so the defaults match today's rendering. I also changed the label "Line color:", copied from Crystal, to "Arrow color:". I committed on 2026-11-13 on `force-arrow-settings` after `git clang-format origin/master` fixed some whitespace and one long line.
 
-[Entry]
+**2026-11-14 to 2026-11-15: building so I could see it**
 
-**[Date]**
+The first build gave me a test suite but no window, because `avogadrolibs` has no app in it; the window comes from `avogadroapp`. So I built three things. The libraries with static plugins in `build/` (for tests), the libraries as shared plugins in `build-app/`, installed to `$HOME/avogadro-dev`, and then `avogadroapp` against that install. Each step failed once: no `cmake`, no GoogleTest, then Spglib and JKQTPlotter needing to be turned off (`USE_SPGLIB`, `USE_PLOTTER`, `USE_LIBMSYM`, `USE_LIBARCHIVE` set to OFF), then the install failing on `../fragments/polymers` until I cloned the `fragments`, `molecules` and `crystals` repos next to it, and avogadroapp needing `-DBUILD_SHARED_LIBS=ON`. At one point I asked whether the first build had been pointless if I could not see my work; it was not, it is the one the tests run on. A VM or container would have hidden these problems, not removed them.
 
-[Entry]
+**2026-11-15: checking it in the app, and what I decided**
+
+The dock showed Arrow length, Arrow width and Arrow color, and changing them redrew the arrows at once. Two things confused me. A short arrow stayed thin when I lowered the width: the radius is 0.02 times each arrow's own length times the width setting, so the width scales with the arrow, which is how `ArrowGeometry` works. And the unchecked boxes looked different in my build from the continuous build, which I put down to the Qt version (I did not confirm that). I checked that the saved values reached the settings file (`force.length` and so on in the macOS plist), but I did not watch them restore after a restart on fresh settings, so I left that out of the evidence. I also decided to scale the force vector by the length setting, not to change the arrow geometry, so the arrow still shows the relative size of the force at any length.
+
+**2026-11-15 to 2026-11-16: the test I did not finish**
+
+I started `tests/qtplugins/forcetest.cpp` from the BallAndStick test, to check that a setting is saved and the display redraws, not that the force is right, since I only wanted to test my own change. It does not compile: the class name is lowercase, a semicolon is missing, `buildMolecule();` is left over, and it calls `setLength`, which is a private slot, so a test cannot call it directly and would have to go through the spin box. It is not registered in `tests/qtplugins/CMakeLists.txt` and it is not in the commit. I chose to open the PR without a test and say so, and ask for a pattern.
+
+**2026-11-16: checks and PR**
+
+`git clang-format origin/master --diff` was clean, `cmake --build build` succeeded and `ctest` passed 155 of 155 (finished 00:05 EST). I ran `plan-check` three times on `plan.md` and `plan-comment.md`: the first rejected the plan for having no observed-before, a vague test plan and a "works in a local build" claim the plan did not back, and the next two accepted after I fixed those. One thing I got wrong: I attributed the "before" to a build I compiled, when it came from the continuous build, and Claude caught it when the version numbers did not match. I fixed the wording. I opened PR #3370 after the ship-gate passed.
+
+**2026-11-17: review**
+
+ghutchis approved with "LGTM, thanks" and asked for nothing. I have not yet replied on the issue thread, and my "this weekend" update there is now out of date.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code in the avogadrolibs clone, in explain-and-review mode only (my `CLAUDE.local.md` rules), with the ship-gate and plan-check around it.
+- What it produced: explanations of the C++ and Qt pieces, line-by-line review of my edits, the build and install recipe, and the dated record above.
+- Difficulties: reviews found my typos one round at a time, and the local build took several failed tries before it worked. It also made two wrong claims that I had to catch: that Crystal pre-fills its color button (it does not), and that the "before" came from a build I compiled.
+- What changed: I check claims against the file I am copying before I rely on them, and I name which build every observation came from.
 
 ---
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/OpenChemistry/avogadrolibs/pull/3370
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Description:** "Add arrow length, width and color settings to the Force display type", from `KJhenelle:force-arrow-settings` to `master`. It changes `force.h` and `force.cpp` only: a settings widget with arrow length, width and color, saved with `QSettings` and applied in `process()`, with defaults equal to the old rendering. It says what is not in the PR (arrow head size), shows the before and after, lists the clang-format, build and 155-test results, says no automated test is included and why, and has an AI-assistance section. It uses `Refs #2095`, not `Fixes`, because head size is left for a follow-up.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- 2026-11-17: ghutchis (maintainer) reviewed: "Thanks. Code looks good - I'll wait until I can test it personally before I approve. (Should work fine, but some GUI testing is needed.)" Later the same day he approved: "LGTM, thanks". No changes were requested.
+- 2026-11-17: I made no code changes and have not replied on the thread; nothing was asked of me. CI on the PR shows 22 checks passing and 6 skipped, and the PR is mergeable.
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Awaiting review (approved by the maintainer on 2026-11-17, waiting for him to merge).
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: pr-precheck inside the ship-gate, run in live mode on the branch and `pr_draft.md`, then the PR opened from a Claude session inside the clone.
+- What it produced: two passes on five checks (plan-fidelity, test-evidence, diff-reviewability, template-and-standards, ai-disclosure). The first run's notes led to three fixes in the description.
+- Difficulties: the gate hook checks the folder the session started in, so it stopped the PR command from my coursework folder; it also only lets the PR through for 30 minutes without changes. It cannot check that screenshots are attached.
+- What changed: I removed the false template/DCO line, switched to `Refs #2095`, and named the continuous build as the source of the "before".
 
 ---
 
@@ -297,25 +313,22 @@ opened.]
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+I learned how a C++/Qt scene plugin gets a settings dock: a `setupWidget()` override that builds the widget once, `private slots` that update a member, call `emit drawablesChanged()` to redraw, and save to `QSettings`, with the saved values loaded in the constructor. I learned that `avogadrolibs` has no window of its own, so seeing my change meant building `avogadroapp` against an installed copy of the libraries, and that the library version in the About dialog is set when CMake configures, so it cannot prove a build includes my change. I also learned how this repo checks work: `git clang-format origin/master --diff`, a CMake/Ninja build, and a 155-test `ctest` run that takes about 10 minutes. Last, I learned the Developer's Certificate of Origin: a `Signed-off-by:` line on every commit, which the DCO bot checks, and which my first commit lacked.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+The build was the hardest part: no `cmake`, no GoogleTest, Spglib and JKQTPlotter that had to be turned off, an install that failed until I cloned the `fragments`, `molecules` and `crystals` repos beside it, and `avogadroapp` needing `-DBUILD_SHARED_LIBS=ON`. I fixed each failure one at a time, and the Implementation Notes record them. Writing C++ without knowing it was the second: my first version had mismatched names, a call to `setLength` and `setArrowSize` on `ArrowGeometry` that do not exist, and a helper I never declared, and I fixed them by reading `arrowgeometry.h` and getting my edits reviewed. Third was getting my evidence right. I attributed the "before" to a build I compiled when it came from the continuous build, I almost used an old screenshot that showed "Line color:" instead of "Arrow color:", and my first commit failed the DCO check, so I amended it with `git commit -s` and force-pushed. I did not manage to write a working automated test. `forcetest.cpp` does not compile, so the PR says there is no test.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+I would read the repo's PR requirements before I commit, including how the DCO bot works, so my first commit is signed and I do not need an amend and a force-push on an open PR. I would write the plan and the evidence as I work, not afterwards, because I wrote `plan.md` after most of the code and had to separate what was done from what was left. I would record which build every screenshot comes from at the moment I take it. I would also get a small test working earlier, or ask the maintainer for a pattern before I wrote the change, so the PR does not have to say there is no test.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- `avogadro/qtplugins/crystal/crystalscene.cpp` in avogadrolibs: the pattern I copied for the settings widget and `QSettings`.
+- Issue #2095, https://github.com/OpenChemistry/avogadrolibs/issues/2095: the maintainer's comment naming `force.cpp` and `crystalscene.cpp` told me where to start.
+- `.github/workflows/build_mac.yml` in avogadrolibs: the source-build steps, since the build guide linked from `AGENTS.md` (https://two.avogadro.cc/develop/build.html) returned a 404.
+- `CONTRIBUTING.md` and `AGENTS.md` in avogadrolibs: the AI policy (levels 0 and 1), the `master` branch, and the full-name rule for commits.
+- ghutchis, the maintainer: he reviewed and approved the PR within a day.
